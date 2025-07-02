@@ -1,0 +1,71 @@
+@import url("https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Poppins:wght@500&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: "Poppins", sans-serif;
+}
+  
+.pt-12 {
+  padding-top: 6rem;
+}
+
+.w-full.max-w-full.container.mx-auto.md\:px-20.px-4.my-8 {
+  margin-top: 70px;
+}
+
+.label-search-bar {
+  width: 120px;
+}
+
+.space-x-4 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-x-reverse: 0;
+  margin-right: calc(1rem * var(--tw-space-x-reverse));
+  margin-left: calc(1rem * calc(1 - var(--tw-space-x-reverse)));
+  display: none;
+}
+
+#imageInput{
+  display: none;
+}
+
+/* Override ReactQuill styles for full width and no border outline */
+.custom-quill .ql-container {
+  width: 100% !important;
+  border: none !important;
+  outline: none !important;
+}
+
+.custom-quill .ql-editor {
+  outline: none !important;
+}
+
+/* Dark mode overrides for ReactQuill */
+.dark .custom-quill .ql-container {
+  background-color: #1E293B !important;
+  border: 1px solid #374151 !important;
+}
+
+.dark .custom-quill .ql-editor {
+  background-color: transparent !important;
+  color: white !important;
+}
+
+.dark .custom-quill .ql-blank {
+  background-color: transparent !important;
+  border: none !important;
+}
+
+/* Search bar container width */
+.px-3.py-2.border.rounded-md.flex.items-center.gap-2 {
+  width: 150px;
+}
+
+/* Search input dark mode background and text color */
+.grow.outline-none.rounded-md.px-1.dark\:bg-slate-900.dark\:text-white {
+  background-color: #1e293b;
+  color: white;
+  width: 120px;
+}

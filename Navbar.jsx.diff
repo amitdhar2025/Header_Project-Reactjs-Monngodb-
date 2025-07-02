@@ -1,0 +1,16 @@
+const [sticky, setSticky] = useState(false);
+  useEffect(() => {
+=======
+  const [sticky, setSticky] = useState(false);
+  useEffect(() => {
+>>>>>>> REPLACE
+
+<<<<<<< SEARCH
+  );
+}
+
+export default Navbar;
+=======
+  );
+}
+export default Navbar;
