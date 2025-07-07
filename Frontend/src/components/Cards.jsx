@@ -1,8 +1,18 @@
 import React, { useContext } from "react";
 import { CartContext } from "../context/CartContext";
+import { useAuth } from "../context/AuthProvider";
 
 function Cards({ item }) {
   const { addToCart } = useContext(CartContext);
+  const [authUser] = useAuth();
+
+  const handleAddToCart = () => {
+    if (!authUser) {
+      alert("Please sign in first");
+      return;
+    }
+    addToCart(item);
+  };
 
   return (
     <>
@@ -25,7 +35,7 @@ function Cards({ item }) {
           <div className="flex justify-between items-center mt-4">
             <span className="text-pink-600 font-bold text-lg">${item.price}</span>
             <button
-              onClick={() => addToCart(item)}
+              onClick={handleAddToCart}
               className="bg-pink-500 text-white px-3 py-1 rounded-full hover:bg-pink-600 transition-colors duration-300"
             >
               Add to Cart

@@ -1,8 +1,10 @@
-import React, { createContext, useState, useEffect } from "react";
+import React, { createContext, useState, useEffect, useContext } from "react";
+import { useAuth } from "./AuthProvider";
 
 export const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
+  const [authUser] = useAuth();
   const [cartItems, setCartItems] = useState(() => {
     const savedCart = localStorage.getItem("cartItems");
     return savedCart ? JSON.parse(savedCart) : [];
@@ -12,49 +14,129 @@ export const CartProvider = ({ children }) => {
     localStorage.setItem("cartItems", JSON.stringify(cartItems));
   }, [cartItems]);
 
-  const addToCart = (item) => {
-    setCartItems((prevItems) => {
-      // Always add new item entry without aggregation
-      return [...prevItems, { ...item }];
-    });
-  };
-
-  const removeFromCart = (itemId) => {
-    setCartItems((prevItems) => prevItems.filter((i) => i.id !== itemId));
-  };
-
-  const removeItemByIndex = (index) => {
-    setCartItems((prevItems) => {
-      const newItems = [...prevItems];
-      newItems.splice(index, 1);
-      return newItems;
-    });
-  };
-
-  const removeOneFromCart = (itemId) => {
-    setCartItems((prevItems) => {
-      return prevItems
-        .map((item) => {
-          if (item.id === itemId) {
-            if (item.quantity > 1) {
-              return { ...item, quantity: item.quantity - 1 };
-            } else {
-              return null;
-            }
+  useEffect(() => {
+    const fetchCart = async () => {
+      if (authUser && authUser.token) {
+        try {
+          console.log("Fetching cart for user:", authUser._id);
+          const response = await fetch("http://localhost:4002/cart", {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${authUser.token}`,
+            },
+          });
+          if (response.ok) {
+            const data = await response.json();
+            console.log("Cart fetched:", data);
+            const itemsArray = data.items || [];
+            const items = itemsArray.map((item) => ({
+              id: item.productId._id,
+              name: item.productId.name,
+              price: item.productId.price,
+              image: item.productId.image,
+              quantity: item.quantity,
+            }));
+            setCartItems(items);
           }
-          return item;
-        })
-        .filter(Boolean);
-    });
+        } catch (error) {
+          console.error("Failed to fetch cart:", error);
+        }
+      } else {
+        setCartItems([]);
+      }
+    };
+    fetchCart();
+  }, [authUser]);
+
+  const addToCart = async (item) => {
+    if (!authUser || !authUser.token) {
+      console.log("Add to cart ignored: user not signed in");
+      return;
+    }
+    try {
+      console.log("Adding to cart:", item);
+      const response = await fetch("http://localhost:4002/cart/add", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authUser.token}`,
+        },
+        body: JSON.stringify({ productId: item._id, quantity: 1 }),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Add to cart response:", data);
+        const items = data.items.map((item) => ({
+          id: item.productId._id,
+          name: item.productId.name,
+          price: item.productId.price,
+          image: item.productId.image,
+          quantity: item.quantity,
+        }));
+        setCartItems(items);
+      } else {
+        console.error("Add to cart failed with status:", response.status);
+      }
+    } catch (error) {
+      console.error("Failed to add to cart:", error);
+    }
   };
 
-  const clearCart = () => {
-    setCartItems([]);
+  const removeFromCart = async (itemId) => {
+    if (!authUser || !authUser.token) {
+      setCartItems((prevItems) => prevItems.filter((i) => i.id !== itemId));
+      return;
+    }
+    try {
+      const response = await fetch("http://localhost:4002/cart/remove", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authUser.token}`,
+        },
+        body: JSON.stringify({ productId: itemId }),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        const items = data.items.map((item) => ({
+          id: item.productId._id,
+          name: item.productId.name,
+          price: item.productId.price,
+          image: item.productId.image,
+          quantity: item.quantity,
+        }));
+        setCartItems(items);
+      }
+    } catch (error) {
+      console.error("Failed to remove from cart:", error);
+    }
+  };
+
+  const clearCart = async () => {
+    if (!authUser || !authUser.token) {
+      setCartItems([]);
+      return;
+    }
+    try {
+      const response = await fetch("http://localhost:4002/cart/clear", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authUser.token}`,
+        },
+      });
+      if (response.ok) {
+        setCartItems([]);
+      }
+    } catch (error) {
+      console.error("Failed to clear cart:", error);
+    }
   };
 
   return (
     <CartContext.Provider
-      value={{ cartItems, addToCart, removeFromCart, clearCart, removeItemByIndex }}
+      value={{ cartItems, addToCart, removeFromCart, clearCart }}
     >
       {children}
     </CartContext.Provider>

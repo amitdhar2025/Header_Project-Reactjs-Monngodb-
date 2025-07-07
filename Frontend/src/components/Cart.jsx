@@ -5,7 +5,7 @@ function Cart() {
   const { cartItems, removeFromCart, clearCart, removeItemByIndex } = useContext(CartContext);
 
   const totalPrice = cartItems.reduce(
-    (total, item) => total + item.price,
+    (total, item) => total + item.price * (item.quantity || 1),
     0
   );
 
@@ -22,6 +22,7 @@ function Cart() {
                 <th className="border border-gray-300 dark:border-gray-600 p-2 text-left">Image</th>
                 <th className="border border-gray-300 dark:border-gray-600 p-2 text-left">Name</th>
                 <th className="border border-gray-300 dark:border-gray-600 p-2 text-left">Price</th>
+                <th className="border border-gray-300 dark:border-gray-600 p-2 text-left">Quantity</th>
                 <th className="border border-gray-300 dark:border-gray-600 p-2 text-left">Action</th>
               </tr>
             </thead>
@@ -37,6 +38,7 @@ function Cart() {
                   </td>
                   <td className="border border-gray-300 p-2 font-semibold">{item.name}</td>
                   <td className="border border-gray-300 p-2">${item.price}</td>
+                  <td className="border border-gray-300 p-2">{item.quantity || 1}</td>
                   <td className="border border-gray-300 p-2">
                     <button
                       onClick={() => removeItemByIndex(index)}

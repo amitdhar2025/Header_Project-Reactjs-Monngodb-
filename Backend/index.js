@@ -6,6 +6,7 @@ import cors from "cors";
 import bookRoute from "./route/book.route.js";
 import userRoute from "./route/user.route.js";
 import { seedAdminUser } from "./controller/sampleData.js";
+import cartRoute from "./route/cart.route2.js";
 
 const app = express();
 
@@ -57,6 +58,7 @@ if (URI) {
 // defining routes
 app.use("/book", bookRoute);
 app.use("/user", userRoute);
+app.use("/cart", cartRoute);
 
 import navigationMenuRoute from "./route/navigationMenu.route.js";
 import richTextRoute from "./route/richText.route.js";

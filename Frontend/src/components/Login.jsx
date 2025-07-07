@@ -19,10 +19,13 @@ function Login() {
         password,
       });
       if (response.data.message === "Login successful") {
-        // Save token or user info as needed
-        // Save authUser in context and localStorage
-        setAuthUser(response.data.user);
-        localStorage.setItem("Users", JSON.stringify(response.data.user));
+        // Save token and user info
+        const authData = {
+          token: response.data.token,
+          user: response.data.user,
+        };
+        setAuthUser(authData);
+        localStorage.setItem("Users", JSON.stringify(authData));
         // Redirect to /admin after login
         navigate("/admin");
       } else {
