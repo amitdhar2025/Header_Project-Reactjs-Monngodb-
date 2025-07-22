@@ -50,8 +50,25 @@ export const CartProvider = ({ children }) => {
   }, [authUser]);
 
   const addToCart = async (item) => {
-    if (!authUser || !authUser.token) {
-      console.log("Add to cart ignored: user not signed in");
+    console.log("addToCart called with authUser:", authUser);
+    // Use token from authUser stored in localStorage "Users"
+    let token = null;
+    if (authUser && authUser.token) {
+      token = authUser.token;
+    } else {
+      const storedUser = localStorage.getItem("Users");
+      if (storedUser) {
+        try {
+          const parsedUser = JSON.parse(storedUser);
+          token = parsedUser.token || parsedUser.accessToken || null;
+        } catch {
+          token = null;
+        }
+      }
+    }
+    console.log("Token used for addToCart:", token);
+    if (!authUser || !authUser._id || !token) {
+      console.log("Add to cart ignored: user not signed in or token missing", authUser);
       return;
     }
     try {
@@ -60,7 +77,7 @@ export const CartProvider = ({ children }) => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${authUser.token}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ productId: item._id, quantity: 1 }),
       });

@@ -42,13 +42,12 @@ const URI = process.env.MongoDBURI;
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 if (URI) {
-    mongoose.connect(URI, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-    }).then(async () => {
+    mongoose.connect(URI)
+    .then(async () => {
         console.log("Connected to mongoDB");
         await seedAdminUser();
-    }).catch((error) => {
+    })
+    .catch((error) => {
         console.log("Error connecting to mongoDB: ", error);
     });
 } else {
@@ -70,6 +69,14 @@ app.get('/', (req, res) => {
   res.json({ message: 'Welcome to the BookStore API' });
 });
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`Server is listening on port ${PORT}`);
+});
+
+server.on('error', (error) => {
+  if (error.code === 'EADDRINUSE') {
+    console.error(`Port ${PORT} is already in use. Please free the port or use a different one.`);
+  } else {
+    console.error('Server error:', error);
+  }
 });

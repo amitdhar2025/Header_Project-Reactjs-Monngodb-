@@ -18,19 +18,21 @@ function Login() {
         email,
         password,
       });
-      if (response.data.message === "Login successful") {
-        // Save token and user info
-        const authData = {
-          token: response.data.token,
-          user: response.data.user,
-        };
-        setAuthUser(authData);
-        localStorage.setItem("Users", JSON.stringify(authData));
-        // Redirect to /admin after login
-        navigate("/admin");
-      } else {
-        setError(response.data.message || "Login failed");
-      }
+        if (response.data.message === "Login successful") {
+          // Save token and user info
+          const authData = {
+            token: response.data.token,
+            ...response.data.user,
+          };
+          setAuthUser(authData);
+          // Save token and user info separately in localStorage for CartContext usage
+          localStorage.setItem("Users", JSON.stringify(authData));
+          localStorage.setItem("token", response.data.token);
+          // Redirect to /admin after login
+          navigate("/admin");
+        } else {
+          setError(response.data.message || "Login failed");
+        }
     } catch (err) {
       setError("Login failed: " + (err.response?.data?.message || err.message));
     }

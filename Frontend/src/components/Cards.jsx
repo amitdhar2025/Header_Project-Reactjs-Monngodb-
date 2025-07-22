@@ -1,17 +1,29 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { CartContext } from "../context/CartContext";
 import { useAuth } from "../context/AuthProvider";
+import { useNavigate } from "react-router-dom";
 
 function Cards({ item }) {
   const { addToCart } = useContext(CartContext);
   const [authUser] = useAuth();
+  const navigate = useNavigate();
+  const [showModal, setShowModal] = useState(false);
 
   const handleAddToCart = () => {
     if (!authUser) {
-      alert("Please sign in first");
+      setShowModal(true);
       return;
     }
     addToCart(item);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+  };
+
+  const handleLoginRedirect = () => {
+    setShowModal(false);
+    navigate("/login");
   };
 
   return (
@@ -43,6 +55,30 @@ function Cards({ item }) {
           </div>
         </div>
       </div>
+
+      {showModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-sm w-full text-center">
+            <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
+              Please sign in to add items to your cart
+            </h3>
+            <div className="flex justify-center space-x-4">
+              <button
+                onClick={handleLoginRedirect}
+                className="px-4 py-2 bg-pink-600 text-white rounded hover:bg-pink-700"
+              >
+                Go to Login
+              </button>
+              <button
+                onClick={handleCloseModal}
+                className="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-gray-200 rounded hover:bg-gray-400"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
